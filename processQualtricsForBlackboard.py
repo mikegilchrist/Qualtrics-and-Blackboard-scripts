@@ -117,11 +117,14 @@ with open(sys.argv[2], 'rb') as csvfile:
 		shuffle(comments)
 		row[6] = str(finalScore);
 		row[9] = "\"<html><b><u>Peer Score =</u></b> " + str(peerScore) + " ";
-		for index, comment in enumerate(comments):
+		index = 1;
+		for comment in comments:
 			if(comment != ""):
 				row[9] += "</br>"
-				row[9] += str(index + 1);
+				row[9] += str(index);
 				row[9] += ") " + comment;
+				index += 1;
+			
 		if(netID not in hasCompletedSurvey):
 			row[9] += "</br><b>**DID NOT SUBMIT RATINGS FOR OTHER TEAM MEMBERS. STUDENT RECEVING 0 CREDIT**</b>";
 		row[9] += "</html>\""
