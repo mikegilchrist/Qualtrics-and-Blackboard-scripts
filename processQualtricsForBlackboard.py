@@ -2,6 +2,7 @@ from xml.dom import minidom
 import sys
 import random
 import time
+import string;
 import numpy
 from random import shuffle
 if 'nltk' in sys.modules:
@@ -119,6 +120,11 @@ if(len(Responses) == 0):
 #Dictionary of scores and comments for each student keyed on their student ID
 Reviews = {}
 
+#This will be used to remove any non-printable characters
+printable = set(string.printable)
+
+printInfo = 1;
+
 for Response in Responses:
 
 	try:
@@ -151,11 +157,14 @@ for Response in Responses:
 	try:
 		Contribute = Response.getElementsByTagName('Contribute')[0].firstChild.data;
 	except:
-		print sys.exc_info()[0]
-		print sys.exc_info()[1]
-		print "A response did not have the 'Contribute' tag"
-		print "Either change the input.xml file to have tags named 'Contribute' or change what this line looks for"
-		exit(1);
+		if(printInfo):
+			Contribute = 1;
+			print sys.exc_info()[0]
+			print sys.exc_info()[1]
+			print "A response did not have the 'Contribute' tag"
+			print "Either change the input.xml file to have tags named 'Contribute' or change what this line looks for"
+			print;
+			printInfo = 0;
 
 	if(Contribute == '0'):
 		studentsWhoDidntContribute.append(netid.firstChild.data);
@@ -215,6 +224,15 @@ for Response in Responses:
 		except:
 			comment = ""
 
+		newComment = "";
+
+		#Remove non-printable characters
+		for letter in comment:
+			if(letter in printable):
+				newComment += letter;	
+
+		comment = newComment;
+		
 		#Remove any quotes from the comment
 		comment = re.sub('"', '', comment);
 		peerID = peerNetID.firstChild.data
