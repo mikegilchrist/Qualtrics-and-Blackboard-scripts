@@ -1,6 +1,7 @@
 from xml.dom import minidom
 import sys
 import random
+from random import randint
 import time
 import string;
 import numpy
@@ -12,12 +13,13 @@ if 'nltk' in sys.modules:
 import csv
 import sys
 import re
+import datetime;
 
 #Set this flag to 0 if you don't want the program to check for similar comments
 checkForSimilarityOfComments = 1;
 #Set this to the percentage of words that should match across reviews for the program to flag a set of reviews
 similarityThreshold = .75
-
+now = datetime.datetime.now()
 
 
 #Returns the percentage of words that match in 2 comments
@@ -92,7 +94,8 @@ if(len(sys.argv) == 5):
 		print "Useage: python processBlackboardForQualtrics.py input.xml format.csv output.csv seed[Optional]"
 		exit(0);
 else:
-	random.seed(time.time())
+	seed = randint(0, 100);
+	random.seed(seed)
 
 
 hasCompletedSurvey = []
@@ -125,6 +128,17 @@ printable = set(string.printable)
 
 printInfo = 1;
 
+print "Seed used = " + str(seed);
+print "Time of execution = " + now.strftime("%Y-%m-%d %H:%M");
+print "Git version number = 7";
+sys.stdout.write("Arguments used = ");
+for i in range(0, len(sys.argv)):
+	sys.stdout.write(sys.argv[i] + "  ");
+print 
+print
+
+
+
 for Response in Responses:
 
 	try:
@@ -150,7 +164,7 @@ for Response in Responses:
 		print "Either change the input.xml file to have tags named 'Finished' or change what this line looks for"
 		exit(1);
 
-	if(finished == '0'):
+	if(finished != '1'):
 		studentsWhoDidntFinishSurvey.append(netid.firstChild.data);
 		continue;
 
@@ -166,13 +180,9 @@ for Response in Responses:
 			print;
 			printInfo = 0;
 
-	if(Contribute == '0'):
+	if(Contribute != '1'):
 		studentsWhoDidntContribute.append(netid.firstChild.data);
 		continue;
-
-
-
-
 
 	while(1):
 		i += 1;
@@ -261,11 +271,11 @@ for Response in Responses:
 			
 studentsScores = [];
 rawScores = [];
-		
 gradeIndex = -1;
 commentIndex = -1;
 netIDIndex = -1;
 incompleteCount = 0;
+
 try:
 	with open(sys.argv[2], 'rb') as csvfile:
 		spamreader = csv.reader(x.replace('\0', '') for x in csvfile);
@@ -415,14 +425,15 @@ try:
 			row[gradeIndex] = str(finalScore);
 			row[commentIndex] = "\"<html><b><u>Peer Score =</u></b> " + str(peerScore) + " ";
 			index = 1;
-			for comment in comments:
-				if(comment != ""):
-					row[commentIndex] += "</br>"
-					row[commentIndex] += str(index);
-					row[commentIndex] += ") " + comment;
-					index += 1;
-			if(hadPointsReduced):
-				row[commentIndex] += "</br><b>**YOU DID NOT GIVE UNIQUE FEEDBACK TO YOUR PEERS, THEREFORE YOUR GRADE WAS REDUCED**</b>";
+			if(netID not in studentsWhoDidntContribute):
+				for comment in comments:
+					if(comment != ""):
+						row[commentIndex] += "</br>"
+						row[commentIndex] += str(index);
+						row[commentIndex] += ") " + comment;
+						index += 1;
+				if(hadPointsReduced):
+					row[commentIndex] += "</br><b>**YOU DID NOT GIVE UNIQUE FEEDBACK TO YOUR PEERS, THEREFORE YOUR GRADE WAS REDUCED**</b>";
 			
 
 				
@@ -439,6 +450,11 @@ try:
 				OUTPUT.write(str(item));
 				if(index != len(row) - 1):
 					OUTPUT.write(",");
+
+
+			
+
+
 			print >>OUTPUT;
 except:
 	print sys.exc_info()[0]
