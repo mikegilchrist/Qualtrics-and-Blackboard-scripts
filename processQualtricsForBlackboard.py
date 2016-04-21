@@ -127,7 +127,7 @@ Reviews = {}
 printable = set(string.printable)
 
 printInfo = 1;
-if(printInfo) printInfoContribute = 1; #set specific flag so that lack of contribute tag message is printed only once.
+if(printInfo): printInfoContribute = 1;  #set specific flag so that lack of contribute tag message is printed only once.
 
 print "Seed used = " + str(seed);
 print "Time of execution = " + now.strftime("%Y-%m-%d %H:%M");
