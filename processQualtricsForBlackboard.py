@@ -127,6 +127,7 @@ Reviews = {}
 printable = set(string.printable)
 
 printInfo = 1;
+if(printInfo) printInfoContribute = 1; #set specific flag so that lack of contribute tag message is printed only once.
 
 print "Seed used = " + str(seed);
 print "Time of execution = " + now.strftime("%Y-%m-%d %H:%M");
@@ -170,15 +171,16 @@ for Response in Responses:
 
 	try:
 		Contribute = Response.getElementsByTagName('Contribute')[0].firstChild.data;
-	except:
-		if(printInfo):
-			Contribute = 1;
+	except IndexError: # test for specific error
+                Contribute = '1' #tag not found so set value to 1
+		if(printInfoContribute):
 			print sys.exc_info()[0]
 			print sys.exc_info()[1]
-			print "A response did not have the 'Contribute' tag"
-			print "Either change the input.xml file to have tags named 'Contribute' or change what this line looks for"
+			print "Response lacking 'Contribute' tag"
+			print "Variable 'Contribute' begin set to '1' for this and all other entries."
+                        printInfoContribute=0;
 			print;
-			printInfo = 0;
+			#printInfo = 0; #commented out by mikeg. Not sure why you want to stop the printing.
 
 	if(Contribute != '1'):
 		studentsWhoDidntContribute.append(netid.firstChild.data);
